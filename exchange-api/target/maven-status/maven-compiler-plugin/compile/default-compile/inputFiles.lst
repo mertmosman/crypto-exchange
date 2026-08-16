@@ -1,0 +1,11 @@
+C:\Users\Acer\IdeaProjects\crypto-exchange\exchange-api\src\main\java\com\crypto\exchange_api\controller\OrderController.java
+C:\Users\Acer\IdeaProjects\crypto-exchange\exchange-api\src\main\java\com\crypto\exchange_api\controller\WalletController.java
+C:\Users\Acer\IdeaProjects\crypto-exchange\exchange-api\src\main\java\com\crypto\exchange_api\ExchangeApiApplication.java
+C:\Users\Acer\IdeaProjects\crypto-exchange\exchange-api\src\main\java\com\crypto\exchange_api\model\Order.java
+C:\Users\Acer\IdeaProjects\crypto-exchange\exchange-api\src\main\java\com\crypto\exchange_api\model\Trade.java
+C:\Users\Acer\IdeaProjects\crypto-exchange\exchange-api\src\main\java\com\crypto\exchange_api\model\Wallet.java
+C:\Users\Acer\IdeaProjects\crypto-exchange\exchange-api\src\main\java\com\crypto\exchange_api\repository\OrderRepository.java
+C:\Users\Acer\IdeaProjects\crypto-exchange\exchange-api\src\main\java\com\crypto\exchange_api\repository\WalletRepository.java
+C:\Users\Acer\IdeaProjects\crypto-exchange\exchange-api\src\main\java\com\crypto\exchange_api\service\KafkaConsumerService.java
+C:\Users\Acer\IdeaProjects\crypto-exchange\exchange-api\src\main\java\com\crypto\exchange_api\service\KafkaProducerService.java
+C:\Users\Acer\IdeaProjects\crypto-exchange\exchange-api\src\main\java\com\crypto\exchange_api\service\OrderService.java

@@ -1,0 +1,11 @@
+com\crypto\exchange_api\model\Trade.class
+com\crypto\exchange_api\controller\OrderController.class
+com\crypto\exchange_api\model\Order.class
+com\crypto\exchange_api\service\KafkaProducerService.class
+com\crypto\exchange_api\service\OrderService.class
+com\crypto\exchange_api\controller\WalletController.class
+com\crypto\exchange_api\ExchangeApiApplication.class
+com\crypto\exchange_api\repository\WalletRepository.class
+com\crypto\exchange_api\model\Wallet.class
+com\crypto\exchange_api\repository\OrderRepository.class
+com\crypto\exchange_api\service\KafkaConsumerService.class
