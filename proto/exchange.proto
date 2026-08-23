@@ -1,0 +1,41 @@
+syntax = "proto3";
+
+package exchange;
+
+option go_package = "matching-engine/proto;proto";
+option java_multiple_files = true;
+option java_package = "com.crypto.exchange_api.grpc";
+option java_outer_classname = "ExchangeProto";
+
+service MatchingEngine {
+    rpc MatchOrder (OrderMessage) returns (MatchResponse);
+    rpc CancelOrder (CancelMessage) returns (CancelResponse);
+}
+
+message OrderMessage {
+    string order_id = 1;
+    string user_id = 2;
+    string symbol = 3;
+    string type = 4; // LIMIT, MARKET
+    string side = 5; // BUY, SELL
+    int64 price = 6;
+    int64 amount = 7;
+    int64 timestamp = 8;
+}
+
+message MatchResponse {
+    bool success = 1;
+    string message = 2;
+    // HFT'de cevap sadece "Aldım ve işledim" şeklindedir.
+    // Eşleşen Trade'ler yine Kafka (veya ayrı bir stream) üzerinden geri döner, 
+    // ancak biz burada gRPC hızını test ediyoruz.
+}
+
+message CancelMessage {
+    string order_id = 1;
+}
+
+message CancelResponse {
+    bool success = 1;
+    string message = 2;
+}
