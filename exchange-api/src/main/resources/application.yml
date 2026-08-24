@@ -8,6 +8,9 @@ spring:
     username: exchange_user
     password: exchange_password
     driver-class-name: org.postgresql.Driver
+    hikari:
+      maximum-pool-size: 100
+      minimum-idle: 10
   
   jpa:
     hibernate:
@@ -31,5 +34,19 @@ spring:
       auto-offset-reset: earliest
       key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
       value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+
+  rabbitmq:
+    host: localhost
+    port: 5672
+
+grpc:
+  client:
+    matching-engine:
+      address: 'static://localhost:50051'
+      negotiation-type: plaintext
+
 server:
   port: 8080
+  tomcat:
+    threads:
+      max: 1000

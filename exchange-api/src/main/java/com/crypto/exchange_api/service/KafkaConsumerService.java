@@ -18,6 +18,7 @@ public class KafkaConsumerService {
 
     private final WalletRepository walletRepository;
     private final OrderRepository orderRepository;
+    private final org.springframework.amqp.rabbit.core.RabbitTemplate rabbitTemplate;
 
     private static final long SATOSHI_SCALE = 100_000_000L;
 
@@ -32,7 +33,7 @@ public class KafkaConsumerService {
             log.info("Trade ID: {} | Fiyat: {} | Miktar: {}", trade.getTradeId(), trade.getPrice(), trade.getAmount());
 
             // 1. ALICI (BUYER) KESİNLEŞTİRMESİ (Settlement)
-            Wallet buyerWallet = walletRepository.findById(trade.getBuyerId()).orElse(null);
+            Wallet buyerWallet = walletRepository.findByIdForUpdate(trade.getBuyerId()).orElse(null);
             Order buyerOrder = orderRepository.findById(trade.getBuyerOrderId()).orElse(null);
 
             if (buyerWallet != null && buyerOrder != null) {
@@ -48,10 +49,15 @@ public class KafkaConsumerService {
                     buyerWallet.setUsdtBalance(buyerWallet.getUsdtBalance() + refundUsdt);
                 }
                 walletRepository.save(buyerWallet);
+                
+                // Siparişin miktarını düş ve durumunu güncelle
+                buyerOrder.setAmount(buyerOrder.getAmount() - trade.getAmount());
+                buyerOrder.setStatus(buyerOrder.getAmount() <= 0 ? "FILLED" : "PARTIAL_FILLED");
+                orderRepository.save(buyerOrder);
             }
 
             // 2. SATICI (SELLER) KESİNLEŞTİRMESİ (Settlement)
-            Wallet sellerWallet = walletRepository.findById(trade.getSellerId()).orElse(null);
+            Wallet sellerWallet = walletRepository.findByIdForUpdate(trade.getSellerId()).orElse(null);
             Order sellerOrder = orderRepository.findById(trade.getSellerOrderId()).orElse(null);
 
             if (sellerWallet != null && sellerOrder != null) {
@@ -59,8 +65,18 @@ public class KafkaConsumerService {
                 long earnedUsdt = (trade.getPrice() * trade.getAmount()) / SATOSHI_SCALE;
                 sellerWallet.setUsdtBalance(sellerWallet.getUsdtBalance() + earnedUsdt);
                 walletRepository.save(sellerWallet);
+
+                // Siparişin miktarını düş ve durumunu güncelle
+                sellerOrder.setAmount(sellerOrder.getAmount() - trade.getAmount());
+                sellerOrder.setStatus(sellerOrder.getAmount() <= 0 ? "FILLED" : "PARTIAL_FILLED");
+                orderRepository.save(sellerOrder);
             }
             log.info("==== TRADE SETTLEMENT BASARILI ====");
+
+            // RabbitMQ'ya asenkron e-posta bildirimleri gönder (Email Service için)
+            rabbitTemplate.convertAndSend("email_queue", "Trade_Success: Buyer " + trade.getBuyerId() + " bought " + trade.getAmount() + " BTC");
+            rabbitTemplate.convertAndSend("email_queue", "Trade_Success: Seller " + trade.getSellerId() + " sold " + trade.getAmount() + " BTC");
+
         } catch (Exception e) {
             log.error("Trade okuma hatası: {}", e.getMessage());
         }
@@ -75,7 +91,7 @@ public class KafkaConsumerService {
 
             Order order = orderRepository.findById(canceledOrderEvent.getOrderId()).orElse(null);
             if (order != null && "CANCEL_REQUESTED".equals(order.getStatus())) {
-                Wallet wallet = walletRepository.findById(order.getUserId()).orElse(null);
+                Wallet wallet = walletRepository.findByIdForUpdate(order.getUserId()).orElse(null);
                 if (wallet != null) {
                     if ("BUY".equalsIgnoreCase(order.getSide())) {
                         long lockedUsdt = (order.getPrice() * order.getAmount()) / SATOSHI_SCALE;
