@@ -148,25 +148,25 @@ func (ob *OrderBook) matchSell(sellOrder *models.Order) []models.Trade {
 	return trades
 }
 
-func (ob *OrderBook) CancelOrder(orderId string) bool {
+func (ob *OrderBook) CancelOrder(orderId string, side string) bool {
 	ob.mu.Lock()
 	defer ob.mu.Unlock()
 
-	// Önce Bids (Alış) tahtasında ara
-	for i, order := range ob.Bids {
-		if order.OrderID == orderId {
-			// Slice'tan sil
-			ob.Bids = append(ob.Bids[:i], ob.Bids[i+1:]...)
-			return true
+	if side == "BUY" {
+		for i, order := range ob.Bids {
+			if order.OrderID == orderId {
+				// Slice'tan sil
+				ob.Bids = append(ob.Bids[:i], ob.Bids[i+1:]...)
+				return true
+			}
 		}
-	}
-	
-	// Sonra Asks (Satış) tahtasında ara
-	for i, order := range ob.Asks {
-		if order.OrderID == orderId {
-			// Slice'tan sil
-			ob.Asks = append(ob.Asks[:i], ob.Asks[i+1:]...)
-			return true
+	} else if side == "SELL" {
+		for i, order := range ob.Asks {
+			if order.OrderID == orderId {
+				// Slice'tan sil
+				ob.Asks = append(ob.Asks[:i], ob.Asks[i+1:]...)
+				return true
+			}
 		}
 	}
 	
