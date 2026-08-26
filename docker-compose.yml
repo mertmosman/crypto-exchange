@@ -45,5 +45,22 @@ services:
     ports:
       - "6379:6379"
 
+  rabbitmq:
+    image: rabbitmq:3-management-alpine
+    container_name: exchange-rabbitmq
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+
+  nginx:
+    image: nginx:alpine
+    container_name: exchange-nginx
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      - kafka
+
 volumes:
   exchange_pg_data:
