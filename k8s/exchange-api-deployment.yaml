@@ -1,0 +1,46 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: exchange-api
+  labels:
+    app: exchange-api
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: exchange-api
+  template:
+    metadata:
+      labels:
+        app: exchange-api
+    spec:
+      containers:
+      - name: exchange-api
+        image: crypto-exchange/exchange-api:latest
+        ports:
+        - containerPort: 8080
+        env:
+        - name: SPRING_DATASOURCE_URL
+          value: "jdbc:postgresql://postgres-service:5432/crypto_wallet"
+        - name: SPRING_KAFKA_BOOTSTRAP_SERVERS
+          value: "kafka-service:9092"
+        resources:
+          requests:
+            cpu: "250m"
+            memory: "512Mi"
+          limits:
+            cpu: "1000m"
+            memory: "1Gi"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: exchange-api-service
+spec:
+  selector:
+    app: exchange-api
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 8080
+  type: LoadBalancer
